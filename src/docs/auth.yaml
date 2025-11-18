@@ -1,0 +1,546 @@
+paths:
+  /auth/register/:
+    post:
+      tags:
+        - Auth
+      summary: User Sign Up Endpoint
+      description: Endpoint for registering new users and creating user accounts securely.
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+            examples:
+              example 1:
+                value:
+                  fullName: Harry Potter
+                  email: harrypotter@example.com
+                  password: expectopatronum
+              example 2:
+                value:
+                  fullName: Hermione Granger
+                  email: hermionegranger@example.com
+                  password: wingardiumleviosa
+              example 3:
+                value:
+                  fullName: Ron Weasley
+                  email: ronweasley@example.com
+                  password: stupefy
+              example 4:
+                value:
+                  fullName: Tom Marvolo Riddle
+                  email: iamlordvoldemort@example.com
+                  password: avadakedavra
+      responses:
+        '202':
+          description: 'Accepted: Account Created.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRegistration202'
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRegistration400'
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRegistration401'
+        '422':
+          description: 'Error: Unprocessable Entity'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User422'
+
+  /auth/user/verify/:
+    post:
+      tags:
+        - Auth
+      summary: User Verification Endpoint
+      description: Efficiently verify user emails to ensure account authenticity and security.
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserVerification'
+            examples:
+              example 1:
+                value:
+                  userId: 639ef959652e087cdc6c7a8e
+                  code: bb3e3eb222a4448d664edcd1da048f3041ceab43b07e579dedadceba9410bc33
+      responses:
+        '200':
+          description: 'Response contain Account verfied message'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserVerification200'
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserVerification400'
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserVerification404'
+
+  /auth/login/:
+    post:
+      tags:
+        - Auth
+      summary: User Login Endpoint
+      description: Secure endpoint for user authentication and login functionality in applications.
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+            examples:
+              example 1:
+                value:
+                  email: harrypotter@example.com
+                  password: expectopatronum
+              example 2:
+                value:
+                  email: hermionegranger@example.com
+                  password: wingardiumleviosa
+              example 3:
+                value:
+                  email: ronweasley@example.com
+                  password: stupefy
+              example 4:
+                value:
+                  email: iamlordvoldemort@example.com
+                  password: avadakedavra
+      responses:
+        '200':
+          description: 'Successful login and returns the authentication cookie'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLogin200'
+          headers:
+            Set-Cookie:
+              description: Session cookie
+              schema:
+                type: string
+                format: cookie
+        '202':
+          description: 'Accepted: Account not verified'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLogin202'
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLogin400'
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLogin401'
+        '422':
+          description: 'Error: Unprocessable Entity'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User422'
+
+  /auth/logout/:
+    get:
+      tags:
+        - Auth
+      summary: User Logout Endpoint
+      description: Endpoint for securely logging out users from applications and terminating sessions.
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: 'Response contain user logout message'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLogout200'
+
+  /auth/password/forgot/:
+    post:
+      tags:
+        - Auth
+      summary: Forgot Password Endpoint
+      description: Endpoint for initiating password reset process and recovering forgotten passwords.
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPassword'
+            examples:
+              example 1:
+                value:
+                  email: harrypotter@example.com
+              example 2:
+                value:
+                  email: iamlordvoldemort@example.com
+      responses:
+        '200':
+          description: 'Response contain email sent message'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForgotPassword200'
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForgotPassword400'
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForgotPassword401'
+        '422':
+          description: 'Error: Unprocessable Entity'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User422'
+
+  /auth/password/reset/verify/:
+    post:
+      tags:
+        - Auth
+      summary: Password Reset Link Verification Endpoint
+      description: Endpoint to verify the validity of password reset links securely.
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyPasswordResetLink'
+            examples:
+              example 1:
+                value:
+                  userId: 636b51634a8da222675406ff
+                  code: 2f5a5134ef32045dbd33731c831362b05fadeda5e056774a24ed3c1498fc14e2
+      responses:
+        '200':
+          description: 'Response contain password reset link valid message'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyPasswordResetLink200'
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyPasswordResetLink400'
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyPasswordResetLink404'
+
+  /auth/password/reset/:
+    post:
+      tags:
+        - Auth
+      summary: Password Reset Endpoint
+      description: Endpoint for securely resetting user passwords and updating account credentials.
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+            examples:
+              example 1:
+                value:
+                  userId: 636b51634a8da222675406ff
+                  code: 2f5a5134ef32045dbd33731c831362b05fadeda5e056774a24ed3c1498fc14e2
+                  newPassword: wingardiumleviosa
+      responses:
+        '200':
+          description: 'Response contain password reset successfully message'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordReset200'
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordReset400'
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordReset404'
+
+components:
+  schemas:
+    User422:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Provide a valid email address.'
+
+    UserRegistration:
+      type: object
+      properties:
+        fullName:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+        - fullName
+        - email
+        - password
+    UserRegistration202:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Account created! Please check your email for the verification link.'
+    UserRegistration400:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'The email address, full name or password are missing or invalid.'
+    UserRegistration401:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'The email address provided already exists. Please provide another email.'
+
+    UserVerification:
+      type: object
+      properties:
+        code:
+          type: string
+        userId:
+          type: string
+      required:
+        - code
+        - userId
+    UserVerification200:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Account Verified: You can Login now.'
+    UserVerification400:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Invalid Link: Account Verification Link Expired.'
+    UserVerification404:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Invalid Link: Account Verification Link Expired.'
+
+    UserLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+        - email
+        - password
+    UserLogin200:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            _id: string
+            fullName: string
+            email: string
+            role: string
+            isAccountVerified: boolean
+            createdAt: string
+            updatedAt: string
+            id: string
+      example:
+        user:
+          {
+            _id: '64a54992856641b0fd84f27d',
+            fullName: 'Harry Potter',
+            email: 'harrypotter@example.com',
+            role: 'admin',
+            isAccountVerified: true,
+            createdAt: '2023-07-05T10:44:34.334Z',
+            updatedAt: '2023-07-05T10:44:34.334Z',
+            id: '64a54992856641b0fd84f27d'
+          }
+    UserLogin202:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Account not yet Verified. Verification Email sent Successfully.'
+    UserLogin400:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'The email address and password are missing or invalid.'
+    UserLogin401:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Invalid Credentials.'
+
+    UserLogout200:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'User logged out!'
+
+    ForgotPassword:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+        - email
+    ForgotPassword200:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Email sent Successfully.'
+    ForgotPassword400:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Please provide your email address.'
+    ForgotPassword401:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'No account found with this email address.'
+
+    VerifyPasswordResetLink:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+        - email
+    VerifyPasswordResetLink200:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Valid Password Reset Link.'
+    VerifyPasswordResetLink400:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Invalid Link: Password Reset Link Expired.'
+    VerifyPasswordResetLink404:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Invalid Link: Password Reset Link Expired.'
+
+    PasswordReset:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+        - email
+    PasswordReset200:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Password Reset Successfully.'
+    PasswordReset400:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Invalid Argument: Password must contain atleast 6 letters.'
+    PasswordReset404:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Invalid Link: Password Reset Link Expired.'

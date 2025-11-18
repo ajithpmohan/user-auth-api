@@ -1,0 +1,531 @@
+paths:
+  /users/:
+    get:
+      tags:
+        - Users
+      summary: User List Endpoint
+      description: Get all users.
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of users per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+      produces:
+        - application/json
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            application/json:
+              type: array
+              schema:
+                $ref: '#/components/schemas/Users'
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserList400'
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnAuthorized401'
+        '403':
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Forbidden403'
+        '500':
+          description: 'Error: Internal Server Error'
+
+  /users/{id}/:
+    get:
+      tags:
+        - Users
+      summary: User Detail Endpoint
+      description: Retrieve a user by their ID.
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+      produces:
+        - application/json
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            application/json:
+              type: array
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnAuthorized401'
+        '403':
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Forbidden403'
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail404'
+        '500':
+          description: 'Error: Internal Server Error'
+
+  /users/me/:
+    get:
+      tags:
+        - Users
+      summary: Current Logged-in User Detail Endpoint
+      description: Retrieve current logged in user.
+      produces:
+        - application/json
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            application/json:
+              type: array
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnAuthorized401'
+        '500':
+          description: 'Error: Internal Server Error'
+    put:
+      tags:
+        - Users
+      summary: Update Logged-in User Endpoint
+      description: Update user information including email, fullname, and avatar.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: 'User updated successfully'
+          content:
+            application/json:
+              type: array
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserUpdate400'
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnAuthorized401'
+        '409':
+          description: 'Error: Conflict'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserUpdate409'
+        '413':
+          description: 'Error: Content Too Large'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserUpdate413'
+        '415':
+          description: 'Error: Unsupported Media Type'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserUpdate415'
+        '422':
+          description: 'Error: Unprocessable Entity'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserUpdate422'
+        '500':
+          description: 'Error: Internal Server Error'
+
+  /users/password/update/:
+    put:
+      tags:
+        - Users
+      summary: Update Logged-in User Password Endpoint
+      description: Update user password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPasswordUpdate'
+            examples:
+              example 1:
+                value:
+                  oldPassword: stupefy
+                  newPassword: riddikulus
+      produces:
+        - application/json
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: 'Password updated successfully'
+          content:
+            application/json:
+              type: array
+              schema:
+                $ref: '#/components/schemas/UserPasswordUpdate200'
+        '400':
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPasswordUpdate400'
+        '401':
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnAuthorized401'
+        '403':
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPasswordUpdate403'
+        '422':
+          description: 'Error: Unprocessable Entity'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPasswordUpdate422'
+        '500':
+          description: 'Error: Internal Server Error'
+
+components:
+  schemas:
+    UnAuthorized401:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Authentication Failed - Token missing'
+    Forbidden403:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Unauthorized to access this route'
+
+    Users:
+      type: object
+      properties:
+        paging:
+          type: object
+          properties:
+            hasMore:
+              type: boolean
+            currentPage:
+              type: number
+            totalPages:
+              type: number
+            currentItems:
+              type: number
+            totalItems:
+              type: number
+        users:
+          type: array
+          properties:
+            type: object
+            properties:
+              _id:
+                type: string
+                description: User ID
+              fullName:
+                type: string
+                description: Full name of the user
+              email:
+                type: string
+                description: Email address of the user
+              role:
+                type: string
+                description: Role of the user
+              isAccountVerified:
+                type: boolean
+                description: Indicates if the user's account is verified
+              avatar:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: Name
+                  url:
+                    type: string
+                    description: URL Path
+                  isPublicUrl:
+                    type: boolean
+                    description: Is Public Url
+              createdAt:
+                type: string
+                format: date-time
+                description: Creation timestamp of the user
+              updatedAt:
+                type: string
+                format: date-time
+                description: Last update timestamp of the user
+              id:
+                type: string
+                description: User ID
+      example:
+        paging:
+          {
+            hasMore: false,
+            currentPage: 1,
+            totalPages: 2,
+            currentItems: 1,
+            totalItems: 2
+          }
+        users:
+          [
+            {
+              _id: '64a54992856641b0fd84f27d',
+              fullName: 'Harry Potter',
+              email: 'harrypotter@example.com',
+              role: 'admin',
+              isAccountVerified: true,
+              avatar:
+                {
+                  name: 'dp.jpg',
+                  url: '/uploads/avatar/dp.jpg',
+                  isPublicUrl: false
+                },
+              createdAt: '2023-06-29T05:27:55.065Z',
+              updatedAt: '2023-07-05T14:37:22.617Z',
+              id: '64a54992856641b0fd84f27d'
+            }
+          ]
+
+    UserList400:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Provide a valid limit and page number values.'
+
+    User:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            _id:
+              type: string
+              description: User ID
+            fullName:
+              type: string
+              description: Full name of the user
+            email:
+              type: string
+              description: Email address of the user
+            role:
+              type: string
+              description: Role of the user
+            isAccountVerified:
+              type: boolean
+              description: Indicates if the user's account is verified
+            avatar:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name
+                url:
+                  type: string
+                  description: URL Path
+                isPublicUrl:
+                  type: boolean
+                  description: Is Public Url
+            createdAt:
+              type: string
+              format: date-time
+              description: Creation timestamp of the user
+            updatedAt:
+              type: string
+              format: date-time
+              description: Last update timestamp of the user
+            id:
+              type: string
+              description: User ID
+      example:
+        user:
+          {
+            _id: '64a54992856641b0fd84f27d',
+            fullName: 'Harry Potter',
+            email: 'harrypotter@example.com',
+            role: 'admin',
+            isAccountVerified: true,
+            avatar:
+              {
+                name: 'dp.jpg',
+                url: '/uploads/avatar/dp.jpg',
+                isPublicUrl: false
+              },
+            createdAt: '2023-06-29T05:27:55.065Z',
+            updatedAt: '2023-07-05T14:37:22.617Z',
+            id: '64a54992856641b0fd84f27d'
+          }
+
+    UserDetail404:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'User not found'
+
+    UserUpdate:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: User email
+        fullName:
+          type: string
+          description: User full name
+        avatar:
+          type: string
+          format: binary
+          description: User avatar (image)
+      required:
+        - fullName
+        - email
+    UserUpdate400:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'The email address and full name are missing or invalid.'
+    UserUpdate409:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'The email address provided already exists. Please provide another email.'
+    UserUpdate413:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Please upload an image smaller than 1MB'
+    UserUpdate415:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'The uploaded file is not a supported image format.'
+    UserUpdate422:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Provide a valid email address.'
+
+    UserPasswordUpdate:
+      type: object
+      properties:
+        oldPassword:
+          type: string
+          description: User Old Password
+        newPassword:
+          type: string
+          description: User New Password
+      required:
+        - oldPassword
+        - newPassword
+    UserPasswordUpdate200:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Password Successfully Updated.'
+    UserPasswordUpdate400:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'The Old Password & New Password values are missing or invalid.'
+    UserPasswordUpdate403:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Invalid Old Password.'
+    UserPasswordUpdate422:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 'Password must contain atleast 6 letters.'
+
+  # securitySchemes:
+  #   cookieAuth:
+  #     type: apiKey
+  #     in: cookie
+  #     name: token

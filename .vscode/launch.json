@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debugger for Auth API Service",
+      "type": "node",
+      "request": "attach",
+      "restart": true,
+      "port": 9229,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "/app",
+      "protocol": "inspector"
+    }
+  ]
+}

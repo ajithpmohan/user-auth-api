@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "redhat.vscode-yaml",
+    "pkief.material-icon-theme",
+    "mikestead.dotenv",
+    "wix.vscode-import-cost",
+    "christian-kohler.npm-intellisense",
+    "mongodb.mongodb-vscode",
+    "robbowen.synthwave-vscode"
+  ]
+}
