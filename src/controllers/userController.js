@@ -1,10 +1,13 @@
+// import { uploadToCloudinary } from '../utils/cloudinary.js';
+import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { StatusCodes } from 'http-status-codes';
 
 import User from '../models/User.js';
 
 import * as CustomError from '../errors/index.js';
 
-import { uploadToCloudinary } from '../utils/cloudinary.js';
+import { s3 } from '../utils/aws.js';
+import ENV from '../utils/constants.js';
 import { emailRegex } from '../utils/helpers.js';
 import { attachCookiesToResponse } from '../utils/jwt.js';
 
@@ -71,7 +74,7 @@ const updateCurrentUser = async (req, res) => {
     );
   }
 
-  let cloudFile;
+  let uploadParams;
   if (avatar) {
     if (!avatar.mimetype.startsWith('image')) {
       throw new CustomError.UnsupportedMediaError(
@@ -87,11 +90,21 @@ const updateCurrentUser = async (req, res) => {
       );
     }
 
-    // call below func after passing all validation
-    cloudFile = await uploadToCloudinary({
-      file: avatar,
-      path: 'avatar'
-    });
+    // Uploading `avatar` to Cloudinary
+    // uploadParams = await uploadToCloudinary({
+    //   file: avatar,
+    //   path: 'avatar'
+    // });
+
+    // Uploading `avatar` to Amazon S3
+    uploadParams = {
+      Bucket: ENV.AWS_S3_BUCKET,
+      Key: `avatar/${Date.now()}-${avatar.name}`,
+      Body: avatar.data,
+      ContentType: avatar.mimetype
+    };
+
+    await s3.send(new PutObjectCommand(uploadParams));
   }
 
   const user = await User.findOneAndUpdate(
@@ -103,8 +116,8 @@ const updateCurrentUser = async (req, res) => {
       ...(avatar && {
         avatar: {
           name: avatar.name,
-          url: cloudFile?.secure_url,
-          isPublicUrl: true
+          url: uploadParams?.Key
+          // url: uploadParams?.secure_url,
         }
       })
     },
