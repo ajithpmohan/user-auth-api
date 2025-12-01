@@ -21,7 +21,6 @@ import authRouter from './routes/authRoutes.js';
 import userRouter from './routes/userRoutes.js';
 
 import ENV from './utils/constants.js';
-// import redisClient from './utils/redis.js';
 import { connectRedis } from './utils/redis.js';
 import winstonLogger from './utils/winston.js';
 
@@ -29,7 +28,6 @@ import setupSwagger from './docs/swaggerSpec.js';
 
 // Initiate Redis connection
 connectRedis();
-// await redisClient.connect();
 
 const app = express();
 
@@ -80,8 +78,6 @@ const start = async () => {
 
     app.listen(port, () => {
       console.log(`Server is listening on port ${port}...`);
-      console.log(`MongoDB URL ${ENV.MONGODB_URI}...`);
-      console.log(`REDIS URL ${ENV.REDIS_HOST}...`);
     });
   } catch (error) {
     console.log(error);
