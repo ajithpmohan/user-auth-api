@@ -7,16 +7,38 @@ echo "Creating systemd service..."
 
 sudo tee $SERVICE_FILE > /dev/null <<EOF
 [Unit]
-Description=My Node App
-After=network.target
+Description=My Node.js Application
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=simple
 User=ubuntu
+Group=ubuntu
 Environment=HOME=/home/ubuntu
 WorkingDirectory=/home/ubuntu/user-auth-api
+
+# --- Load NVM and ensure correct Node version ---
+Environment=NVM_DIR=/home/ubuntu/.nvm
+ExecStartPre=/bin/bash -c 'source "$NVM_DIR/nvm.sh"'
+
+# --- Required for EC2 IMDSv2 Token Fetch (IAM Role credentials) ---
+# AWS SDK automatically retrieves temporary credentials from EC2 IMDS.
+Environment=AWS_EC2_METADATA_SERVICE_ENDPOINT=http://169.254.169.254
+Environment=AWS_EC2_METADATA_DISABLED=false
+CapabilityBoundingSet=CAP_NET_RAW
+AmbientCapabilities=CAP_NET_RAW
+
+# --- Start Application ---
 ExecStart=/home/ubuntu/.nvm/versions/node/v24.11.1/bin/node src/app.js
+
+# --- Restart Policy ---
 Restart=always
+RestartSec=5
+
+# --- Resource Limits (Recommended) ---
+NoNewPrivileges=true
+LimitNOFILE=50000
 
 [Install]
 WantedBy=multi-user.target

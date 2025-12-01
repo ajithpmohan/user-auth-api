@@ -1,6 +1,11 @@
 #!/bin/bash
 # This script sets up NGINX reverse proxy for my Node.js app
 
+echo "=== Installing NGINX ==="
+sudo apt install nginx -y
+sudo systemctl enable nginx
+sudo systemctl start nginx
+
 NGINX_FILE="/etc/nginx/sites-available/myapp"
 
 echo "Creating NGINX site..."
