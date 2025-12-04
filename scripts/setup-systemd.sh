@@ -16,11 +16,11 @@ Type=simple
 User=ubuntu
 Group=ubuntu
 Environment=HOME=/home/ubuntu
-WorkingDirectory=/home/ubuntu/user-auth-api
+WorkingDirectory=/home/ubuntu/app
 
 # --- Load NVM and ensure correct Node version ---
-Environment=NVM_DIR=/home/ubuntu/.nvm
-ExecStartPre=/bin/bash -c 'source "$NVM_DIR/nvm.sh"'
+ExecStartPre=/bin/bash -c 'source /home/ubuntu/.nvm/nvm.sh'
+
 
 # --- Required for EC2 IMDSv2 Token Fetch (IAM Role credentials) ---
 # AWS SDK automatically retrieves temporary credentials from EC2 IMDS.
@@ -35,6 +35,10 @@ ExecStart=/home/ubuntu/.nvm/versions/node/v24.11.1/bin/node src/app.js
 # --- Restart Policy ---
 Restart=always
 RestartSec=5
+
+# --- Logging ---
+StandardOutput=append:/home/ubuntu/logs/access.log
+StandardError=append:/home/ubuntu/logs/error.log
 
 # --- Resource Limits (Recommended) ---
 NoNewPrivileges=true
