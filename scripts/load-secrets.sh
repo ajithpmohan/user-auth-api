@@ -13,17 +13,22 @@ SECRET_JSON=$(aws secretsmanager get-secret-value \
 echo "$SECRET_JSON" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' > $ENV_FILE
 
 # --- Fetch EC2 public IP using IMDSv2 ---
-TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" \
-  -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+# TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" \
+#   -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 
-PUBLIC_IP=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
-  http://169.254.169.254/latest/meta-data/public-ipv4)
+# DOMAIN=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
+#   http://169.254.169.254/latest/meta-data/public-ipv4)
+
+DOMAIN=$(aws ssm get-parameter \
+    --name "/app/env/alb_dns" \
+    --query "Parameter.Value" \
+    --output text)
 
 # Insert or update SWAGGER_DOMAINS
 if grep -q "^SWAGGER_DOMAINS=" "$ENV_FILE"; then
-    sed -i "s|^SWAGGER_DOMAINS=.*|SWAGGER_DOMAINS=http://$PUBLIC_IP|" "$ENV_FILE"
+    sed -i "s|^SWAGGER_DOMAINS=.*|SWAGGER_DOMAINS=http://$DOMAIN|" "$ENV_FILE"
 else
-    echo "SWAGGER_DOMAINS=http://$PUBLIC_IP" >> "$ENV_FILE"
+    echo "SWAGGER_DOMAINS=http://$DOMAIN" >> "$ENV_FILE"
 fi
 
 # Fix permissions
